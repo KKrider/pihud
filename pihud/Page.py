@@ -1,9 +1,7 @@
+from PyQt5 import QtCore, QtWidgets
 
-from PyQt4 import QtCore, QtGui
-
-
-class Page(QtGui.QWidget):
-    """ A container and dropevent catcher for widgets """
+class Page(QtWidgets.QWidget):
+    """ A container and drop event catcher for widgets """
 
     def __init__(self, parent, pihud):
         super(Page, self).__init__(parent)
@@ -12,10 +10,8 @@ class Page(QtGui.QWidget):
         self.widgets = []
         self.show()
 
-
     def dragEnterEvent(self, e):
         e.accept()
-
 
     def dropEvent(self, e):
         # get relative position of mouse from mimedata
@@ -25,7 +21,6 @@ class Page(QtGui.QWidget):
         e.source().move(e.pos() - QtCore.QPoint(x, y))
         e.setDropAction(QtCore.Qt.MoveAction)
         e.accept()
-
 
     def delete_widget(self, widget):
         # refer all deletion requests to the main window (PiHud.py)

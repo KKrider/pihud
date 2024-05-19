@@ -1,6 +1,6 @@
-
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
+from PyQt5.QtCore import *
+from PyQt5.QtGui import *
+from PyQt5.QtWidgets import *
 
 from pihud.util import map_value, in_range
 
@@ -12,38 +12,34 @@ class Bar_Horizontal(QWidget):
         self.config = config
         self.value = config["min"]
 
-        self.font      = QFont()
+        self.font = QFont()
         self.note_font = QFont()
-        self.color     = QColor(config["color"])
+        self.color = QColor(config["color"])
         self.red_color = QColor(config["redline_color"])
-        self.no_color  = QColor()
+        self.no_color = QColor()
         self.no_color.setAlpha(0)
 
-        self.brush     = QBrush(self.color)
+        self.brush = QBrush(self.color)
         self.red_brush = QBrush(self.red_color)
 
-        self.pen       = QPen(self.color)
-        self.red_pen   = QPen(self.red_color)
-        self.no_pen    = QPen(self.no_color)
+        self.pen = QPen(self.color)
+        self.red_pen = QPen(self.red_color)
+        self.no_pen = QPen(self.no_color)
 
         self.font.setPixelSize(self.config["font_size"])
         self.note_font.setPixelSize(self.config["note_font_size"])
         self.pen.setWidth(3)
         self.red_pen.setWidth(3)
 
-
     def render(self, response):
         # approach the value
         self.value += (response.value.magnitude - self.value) / 4
         self.update()
 
-
     def sizeHint(self):
         return QSize(400, 60)
 
-
     def paintEvent(self, e):
-
 
         painter = QPainter()
         painter.begin(self)
@@ -60,29 +56,27 @@ class Bar_Horizontal(QWidget):
 
         painter.end()
 
-
     def pre_compute(self, painter):
         w = self.width()
         h = self.height()
 
         # recompute new values
         self.l = 2            # left X value
-        self.r = w - self.l # right X value
+        self.r = w - self.l   # right X value
         self.t_height = self.config["font_size"] + 8
         self.bar_height = max(0, h - self.t_height) - self.l
         self.value_offset = map_value(self.value,
+                                      self.config["min"],
+                                      self.config["max"],
+                                      self.l,
+                                      self.r)
+        self.red_offset = w
+        if self.config["redline"] is not None:
+            self.red_offset = map_value(self.config["redline"],
                                         self.config["min"],
                                         self.config["max"],
                                         self.l,
                                         self.r)
-        self.red_offset = w
-        if self.config["redline"] is not None:
-            self.red_offset = map_value(self.config["redline"],
-                                          self.config["min"],
-                                          self.config["max"],
-                                          self.l,
-                                          self.r)
-
 
     def draw_title(self, painter):
         painter.save()
@@ -91,7 +85,6 @@ class Bar_Horizontal(QWidget):
         painter.drawText(r, Qt.AlignVCenter, self.config["title"])
 
         painter.restore()
-
 
     def draw_border(self, painter):
         painter.save()
@@ -127,7 +120,6 @@ class Bar_Horizontal(QWidget):
 
         painter.restore()
 
-
     def draw_bar(self, painter):
         painter.save()
         painter.translate(0, self.t_height)
@@ -161,21 +153,18 @@ class Bar_Horizontal(QWidget):
                 ))
         else:
             painter.drawRect(QRect(
-                    self.l,
-                    0,
-                    self.value_offset,
-                    self.bar_height
+                self.l,
+                0,
+                self.value_offset,
+                self.bar_height
             ))
 
         painter.restore()
 
 
-
-
 class Bar_Vertical(Bar_Horizontal):
     def __init__(self, parent, config):
         super(Bar_Vertical, self).__init__(parent, config)
-
 
     def pre_compute(self, painter):
 
@@ -204,7 +193,6 @@ class Bar_Vertical(Bar_Horizontal):
                                         self.l,
                                         self.r)
 
-
     def draw_title(self, painter):
         painter.save()
 
@@ -212,4 +200,3 @@ class Bar_Vertical(Bar_Horizontal):
         painter.drawText(r, Qt.AlignVCenter, self.config["title"])
 
         painter.restore()
-

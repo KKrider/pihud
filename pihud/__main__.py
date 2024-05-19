@@ -1,25 +1,20 @@
-
 import os
 import sys
 import obd
 import shutil
 from PiHud import PiHud
-from PyQt4 import QtGui
+from PyQt5 import QtWidgets
 from GlobalConfig import GlobalConfig
 
 try:
     import RPi.GPIO as GPIO
-except:
-    print "[pihud] Warning: RPi.GPIO library not found"
-
-
+except ImportError:
+    print("[pihud] Warning: RPi.GPIO library not found")
 
 # file paths
-running_dir         = os.path.dirname(os.path.realpath(__file__))
+running_dir = os.path.dirname(os.path.realpath(__file__))
 default_config_path = os.path.join(running_dir, 'default.rc')
-config_path         = os.path.join(os.path.expanduser('~'), 'pihud.rc')
-
-
+config_path = os.path.join(os.path.expanduser('~'), 'pihud.rc')
 
 def main():
     """ entry point """
@@ -29,7 +24,7 @@ def main():
     if not os.path.isfile(config_path):
         # copy the default config
         if not os.path.isfile(default_config_path):
-            print "[pihud] Fatal: Missing default config file. Try reinstalling"
+            print("[pihud] Fatal: Missing default config file. Try reinstalling")
             sys.exit(1)
         else:
             shutil.copyfile(default_config_path, config_path)
@@ -39,7 +34,7 @@ def main():
     # =========================== OBD-II Connection ===========================
 
     if global_config["debug"]:
-        obd.logger.setLevel(obd.logging.DEBUG) # enables all debug information
+        obd.logger.setLevel(obd.logging.DEBUG)  # enables all debug information
 
     connection = obd.Async(global_config["port"])
 
@@ -49,27 +44,22 @@ def main():
 
     # ============================ QT Application =============================
 
-    app = QtGui.QApplication(sys.argv)
+    app = QtWidgets.QApplication(sys.argv)
     pihud = PiHud(global_config, connection)
 
     # ============================== GPIO Setup ===============================
 
     try:
-        pin = self.config.page_adv_pin
+        pin = global_config["page_adv_pin"]
         GPIO.setmode(GPIO.BCM)
-        GPIO.setup(pin,
-                   GPIO.IN,
-                   pull_up_down=GPIO.PUD_UP)
-        GIO.add_event_detect(pin,
-                             GPIO.FALLING,
-                             callback=pihud.next_page,
-                             bouncetime=200)
-    except:
-        pass
+        GPIO.setup(pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+        GPIO.add_event_detect(pin, GPIO.FALLING, callback=pihud.next_page, bouncetime=200)
+    except Exception as e:
+        print(f"[pihud] GPIO setup failed: {e}")
 
     # ================================= Start =================================
 
-    status = app.exec_() # blocks until application quit
+    status = app.exec_()  # blocks until application quit
 
     # ================================= Exit ==================================
 

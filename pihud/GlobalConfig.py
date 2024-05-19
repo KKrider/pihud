@@ -1,4 +1,3 @@
-
 import os
 import json
 from collections import OrderedDict
@@ -8,7 +7,7 @@ from widgets import widgets
 from defaults import default_for
 
 
-class GlobalConfig():
+class GlobalConfig:
     """ manages the structure of the config file """
 
     def __init__(self, filename):
@@ -26,12 +25,10 @@ class GlobalConfig():
         ])
         self.load()
 
-
     def make_config(self, command):
         config = default_for(command)
         config.global_config = self
         return config
-
 
     def __load_keys(self, src, dest):
         """ copies duplicate keys/values from src to dest dictionaries """
@@ -39,12 +36,11 @@ class GlobalConfig():
             if key in src:
                 dest[key] = src[key]
 
-
     def load(self):
         """ reads a config from a file """
 
         # read the file
-        file_config = None;
+        file_config = None
 
         if os.path.isfile(self.filename):
             with open(self.filename, 'r') as f:
@@ -52,9 +48,9 @@ class GlobalConfig():
                 try:
                     file_config = json.loads(raw_config_json)
                 except Exception as e:
-                    print "Invalid json in config:"
-                    print str(e)
-                    self.filename = "" # prevents save()ing
+                    print("Invalid json in config:")
+                    print(str(e))
+                    self.filename = ""  # prevents save()ing
                     return
 
         # load the keys/data into the global config
@@ -70,17 +66,17 @@ class GlobalConfig():
             for widget in page:
 
                 if "sensor" not in widget:
-                    print "widget definition missing 'sensor' attribute"
+                    print("widget definition missing 'sensor' attribute")
                     break
 
                 sensor = widget.pop("sensor").upper()
 
                 if sensor not in obd.commands:
-                    print "unknown sensor name '%s'" % widget["sensor"]
+                    print(f"unknown sensor name '{sensor}'")
                     break
 
                 if widget["type"] not in widgets:
-                    print "unknown sensor name '%s'" % widget["type"]
+                    print(f"unknown widget type '{widget['type']}'")
                     break
 
                 config = self.make_config(obd.commands[sensor])
@@ -93,8 +89,6 @@ class GlobalConfig():
             pages.append(current_page)
 
         self.data['pages'] = pages
-
-
 
     def save(self, pages_configs):
         """ write the config back to the file """
@@ -118,20 +112,17 @@ class GlobalConfig():
             with open(self.filename, 'w') as f:
                 f.write(json.dumps(self.data, indent=4))
 
-
     def __getitem__(self, key):
         if key in self.data:
             return self.data[key]
         else:
-            raise KeyError("'%s' is not a valid config key" % key)
-
+            raise KeyError(f"'{key}' is not a valid config key")
 
     def __setitem__(self, key, value):
         if key in self.data:
             self.data[key] = value
         else:
-            raise KeyError("'%s' is not a valid config key" % key)
-
+            raise KeyError(f"'{key}' is not a valid config key")
 
     def __contains__(self, key):
         return key in self.data

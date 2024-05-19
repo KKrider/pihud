@@ -1,4 +1,3 @@
-
 from math import ceil, floor, log10
 
 
@@ -10,14 +9,14 @@ def scale(_min, _max, step=None):
 
     # handle null ranges
     if _max == _min:
-        return [ float(_min) ]
+        return [float(_min)]
 
     size = _max - _min
 
     if step is None:
         # auto scale step
 
-        step  = 10 ** floor(log10(size))
+        step = 10 ** floor(log10(size))
         ticks = int(size // step)
 
         # if there are less than 5 ticks, try the next power down.
@@ -35,7 +34,6 @@ def scale(_min, _max, step=None):
         # use the user-defined scale
         ticks = int(size // step)
 
-
     start = _min + step
 
     # if the starting value is NOT perfectly divided by the scale step
@@ -44,10 +42,9 @@ def scale(_min, _max, step=None):
         # compute the nearest interval of the scale step
         start = ceil(float(_min) / step) * step
 
-
-    output  = [ float(_min) ]
-    output += [ (start + (step * x)) for x in range(ticks) ]
-    output += [ float(_max) ]
+    output = [float(_min)]
+    output += [(start + (step * x)) for x in range(ticks)]
+    output += [float(_max)]
 
     # if the ends of the scale are two cramped (within a half step)
     # then ditch the 2nd and/or 2nd-to-last values
@@ -81,14 +78,15 @@ def avg_power(s):
 def str_scale(s, multiplier=None):
     if multiplier is None:
         multiplier = 10 ** floor(avg_power(s))
-    return ([str(int(x/multiplier)) for x in s], int(multiplier))
+    return ([str(int(x / multiplier)) for x in s], int(multiplier))
 
 
 # [10, 20, 30, 50]   --->   [0, 10, 10, 20]
 def scale_offsets(s):
-    return [0] + [(b-a) for a, b in zip(s, s[1:])]
+    return [0] + [(b - a) for a, b in zip(s, s[1:])]
+
 
 # tests that value is in range (a, b)
 #                    NOTE: not [a, b]
 def in_range(v, _min, _max):
-    return ((_min < v) and (v < _max))
+    return (_min < v) and (v < _max)

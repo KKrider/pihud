@@ -1,6 +1,6 @@
-
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
+from PyQt5.QtCore import *
+from PyQt5.QtGui import *
+from PyQt5.QtWidgets import *
 
 from pihud.util import scale, map_scale, map_value, scale_offsets, str_scale
 
@@ -12,13 +12,13 @@ class Gauge(QWidget):
         self.config = config
         self.value = config["min"]
 
-        self.font      = QFont()
+        self.font = QFont()
         self.note_font = QFont()
-        self.color     = QColor(config["color"])
+        self.color = QColor(config["color"])
         self.red_color = QColor(config["redline_color"])
-        self.brush     = QBrush(self.color)
-        self.pen       = QPen(self.color)
-        self.red_pen   = QPen(self.red_color)
+        self.brush = QBrush(self.color)
+        self.pen = QPen(self.color)
+        self.red_pen = QPen(self.red_color)
 
         self.font.setPixelSize(self.config["font_size"])
         self.note_font.setPixelSize(self.config["note_font_size"])
@@ -32,26 +32,23 @@ class Gauge(QWidget):
 
         self.red_angle = 270
         if config["redline"] is not None:
-            self.red_angle  = map_value(config["redline"], config["min"], config["max"], 0, 270)
-
+            self.red_angle = map_value(config["redline"], config["min"], config["max"], 0, 270)
 
     def render(self, response):
         # approach the value
         self.value += (response.value.magnitude - self.value) / 8
         self.update()
 
-
     def sizeHint(self):
         return QSize(350, 300)
-
 
     def paintEvent(self, e):
 
         r = min(self.width(), self.height()) / 2
-        self.__text_r   = r - (r/10)   # radius of the text
-        self.__tick_r   = r - (r/4)    # outer radius of the tick marks
-        self.__tick_l   = (r/10)       # length of each tick, extending inwards
-        self.__needle_l = (r/5) * 3    # length of the needle
+        self.__text_r = r - (r / 10)   # radius of the text
+        self.__tick_r = r - (r / 4)    # outer radius of the tick marks
+        self.__tick_l = (r / 10)       # length of each tick, extending inwards
+        self.__needle_l = (r / 5) * 3  # length of the needle
 
         painter = QPainter()
         painter.begin(self)
@@ -70,13 +67,11 @@ class Gauge(QWidget):
 
         painter.end()
 
-
     def draw_marks(self, painter):
 
         painter.save()
 
         painter.translate(self.width() / 2, self.height() / 2)
-
 
         # draw the ticks
 
@@ -91,7 +86,6 @@ class Gauge(QWidget):
 
             painter.drawLine(self.__tick_r, 0, end, 0)
             painter.restore()
-
 
         # draw the arc
 
@@ -110,9 +104,7 @@ class Gauge(QWidget):
         l = -(270 - self.red_angle) * 16
         painter.drawArc(r, s, l)
 
-
         painter.restore()
-
 
     def draw_numbers(self, painter):
 
@@ -130,14 +122,13 @@ class Gauge(QWidget):
             painter.rotate(45)
             painter.rotate(-a)
 
-            r_width  = self.config["font_size"] * len(v)
+            r_width = self.config["font_size"] * len(v)
             r_height = self.config["font_size"]
 
             r = QRect(-r_width / 2, -r_height / 2, r_width, r_height)
             painter.drawText(r, Qt.AlignHCenter | Qt.AlignVCenter, v)
 
             painter.restore()
-
 
     def draw_needle(self, painter):
         painter.save()
@@ -148,20 +139,18 @@ class Gauge(QWidget):
         angle -= 90 + 45
         painter.rotate(angle)
 
-
-        painter.drawEllipse(QPoint(0,0), 5, 5)
+        painter.drawEllipse(QPoint(0, 0), 5, 5)
 
         painter.drawPolygon(
             QPolygon([
                 QPoint(-5, 0),
-                QPoint(0,   -self.__needle_l),
-                QPoint(5,  0),
+                QPoint(0, -self.__needle_l),
+                QPoint(5, 0),
                 QPoint(-5, 0)
             ])
         )
 
         painter.restore()
-
 
     def draw_title(self, painter):
         painter.save()
@@ -171,7 +160,6 @@ class Gauge(QWidget):
         painter.drawText(r, Qt.AlignHCenter | Qt.AlignVCenter, self.config["title"])
 
         painter.restore()
-
 
     def draw_multiplier(self, painter):
         if self.multiplier > 1:

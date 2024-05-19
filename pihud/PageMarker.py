@@ -1,15 +1,14 @@
+from PyQt5 import QtGui, QtCore, QtWidgets
 
-from PyQt4 import QtGui, QtCore
 
-
-class PageMarker(QtGui.QWidget):
+class PageMarker(QtWidgets.QWidget):
     def __init__(self, parent):
         super(PageMarker, self).__init__(parent)
 
         self.height     = 10
         self.bg_color   = QtGui.QColor(255, 255, 255, 50)
         self.fg_color   = QtGui.QColor(255, 255, 255, 70)
-        self.screenRect = QtGui.QApplication.desktop().screen().rect()
+        self.screenRect = QtWidgets.QApplication.desktop().screen().rect()
 
         self.setAutoFillBackground(True)
         p = self.palette()
@@ -30,7 +29,6 @@ class PageMarker(QtGui.QWidget):
         # painter.setRenderHint(QtGui.QPainter.Antialiasing)
         painter.fillRect(self.marker, self.fg_color)
         painter.end()
-
 
     def set(self, n, p):
         inc = self.screenRect.width() / n

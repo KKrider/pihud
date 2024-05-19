@@ -1,10 +1,9 @@
-
 import obd
 from widgets import widgets
-from PyQt4 import QtCore, QtGui
+from PyQt5 import QtCore, QtGui, QtWidgets
 
 
-class Widget(QtGui.QWidget):
+class Widget(QtWidgets.QWidget):
 
     def __init__(self, parent, config):
         super(Widget, self).__init__(parent)
@@ -17,7 +16,7 @@ class Widget(QtGui.QWidget):
         # self.setPalette(palette)
 
         # make the context menu
-        self.menu = QtGui.QMenu()
+        self.menu = QtWidgets.QMenu()
         self.menu.addAction(self.config["sensor"]).setDisabled(True)
 
         subMenu = self.menu.addMenu("Widget Type")
@@ -33,10 +32,8 @@ class Widget(QtGui.QWidget):
         self.move(self.position())
         self.show()
 
-
     def sizeHint(self):
-        if (self.config['w'] is not None) and \
-           (self.config['h'] is not None):
+        if (self.config['w'] is not None) and (self.config['h'] is not None):
             size = QtCore.QSize(self.config['w'], self.config['h'])
             self.graphics.setFixedSize(size)
             return size
@@ -46,29 +43,25 @@ class Widget(QtGui.QWidget):
             self.config['h'] = s.height()
             return s
 
-
     def position(self):
         return QtCore.QPoint(self.config['x'], self.config['y'])
-
 
     def moveEvent(self, e):
         pos = e.pos()
         self.config['x'] = pos.x()
         self.config['y'] = pos.y()
 
-
     def delete(self):
         self.parent().delete_widget(self)
-
 
     def mouseMoveEvent(self, e):
         if e.buttons() == QtCore.Qt.LeftButton:
 
             mimeData = QtCore.QMimeData()
-            mimeData.setText('%d,%d' % (e.x(), e.y()))
+            mimeData.setText(f'{e.x()},{e.y()}')
 
             # show the ghost image while dragging
-            pixmap = QtGui.QPixmap.grabWidget(self)
+            pixmap = self.grab()
             painter = QtGui.QPainter(pixmap)
             painter.fillRect(pixmap.rect(), QtGui.QColor(0, 0, 0, 127))
             painter.end()
@@ -80,18 +73,15 @@ class Widget(QtGui.QWidget):
 
             drag.exec_(QtCore.Qt.MoveAction)
 
-
     def contextMenuEvent(self, e):
         action = self.menu.exec_(self.mapToGlobal(e.pos()))
-
 
     def get_command(self):
         s = self.config["sensor"]
         if s in obd.commands:
             return obd.commands[s]
         else:
-            raise KeyError("'%s' is not a valid OBDCommand" % s)
-
+            raise KeyError(f"'{s}' is not a valid OBDCommand")
 
     def render(self, response):
         if not response.is_null():

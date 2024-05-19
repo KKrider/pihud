@@ -1,19 +1,13 @@
-
-
 from Config import Config
 from obd import commands as c
 
-
 #                         class_name  min  max  redline  scale_step  scale_mult  buffer_size
 fallback_default = Config("Text",     0,   100, None,    None,       1,          60)
-
-
 
 # dict of default configs where key=OBDCommand value=Config
 # all 'Nones's will be filled with values from fallback_default
 # user settings in the config file will override these default values
 defaults = {
-
     # c.PIDS_A            : Config(),
     # c.STATUS            : Config(),
     # c.FREEZE_DTC        : Config(),
@@ -49,7 +43,6 @@ defaults = {
     c.RUN_TIME          : Config("Text",              None, None,   None,    None,       None,       None),
 }
 
-
 # replace all 'None's with values from the fallback_default
 for command in defaults:
     config = defaults[command]
@@ -58,10 +51,8 @@ for command in defaults:
         if config[key] is None:
             config[key] = fallback_default[key]
 
-
 # accessor for creating configs based on the defaults listed above
 def default_for(command):
-
     if command in defaults:
         config = defaults[command].clone()
     else:

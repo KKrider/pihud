@@ -1,20 +1,18 @@
-
 import json
 from collections import OrderedDict
 
-
-class Config():
+class Config:
     """ the configuration for a single readout or command """
 
     # this constructor is only for defining defaults
     def __init__(self,
-                 _class_name     = None,
-                 _min            = None,
-                 _max            = None,
-                 _redline        = None,
-                 _scale_step     = None,
-                 _scale_mult     = None,
-                 _buffer_size    = None):
+                 _class_name=None,
+                 _min=None,
+                 _max=None,
+                 _redline=None,
+                 _scale_step=None,
+                 _scale_mult=None,
+                 _buffer_size=None):
 
         # ordered to make the JSON prettier
         self.data = OrderedDict([
@@ -36,32 +34,27 @@ class Config():
 
         self.global_config = None
 
-
     def clone(self):
         c = Config()
         c.data = OrderedDict(self.data) # copy the data
         return c
 
-
     def __getitem__(self, key):
         if key in self.data:
             return self.data[key]
-        elif key in self.global_config:
+        elif self.global_config and key in self.global_config:
             return self.global_config[key]
         else:
-            raise KeyError("'%s' is not a valid config key" % key)
-
+            raise KeyError(f"'{key}' is not a valid config key")
 
     def __setitem__(self, key, value):
         if key in self.data:
             self.data[key] = value
         else:
-            raise KeyError("'%s' is not a valid config key" % key)
-
+            raise KeyError(f"'{key}' is not a valid config key")
 
     def __contains__(self, key):
         return key in self.data
-
 
     def __iter__(self):
         for key in self.data:

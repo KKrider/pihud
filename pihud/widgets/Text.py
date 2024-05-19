@@ -1,6 +1,6 @@
-
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
+from PyQt5.QtCore import *
+from PyQt5.QtGui import *
+from PyQt5.QtWidgets import *
 
 from pihud.util import map_value, in_range
 
@@ -12,19 +12,19 @@ class Text(QWidget):
         self.config = config
         self.value = config["min"]
 
-        self.font      = QFont()
+        self.font = QFont()
         self.note_font = QFont()
-        self.color     = QColor(config["color"])
+        self.color = QColor(config["color"])
         self.red_color = QColor(config["redline_color"])
-        self.no_color  = QColor()
+        self.no_color = QColor()
         self.no_color.setAlpha(0)
 
-        self.brush     = QBrush(self.color)
+        self.brush = QBrush(self.color)
         self.red_brush = QBrush(self.red_color)
 
-        self.pen       = QPen(self.color)
-        self.red_pen   = QPen(self.red_color)
-        self.no_pen    = QPen(self.no_color)
+        self.pen = QPen(self.color)
+        self.red_pen = QPen(self.red_color)
+        self.no_pen = QPen(self.no_color)
 
         self.font.setPixelSize(self.config["font_size"])
         self.note_font.setPixelSize(self.config["note_font_size"])
@@ -35,15 +35,12 @@ class Text(QWidget):
         if self.red_value is None:
             self.red_value = config["max"]
 
-
     def sizeHint(self):
         return QSize(300, 75)
-
 
     def render(self, response):
         self.value = response.value.magnitude
         self.update()
-
 
     def paintEvent(self, e):
         painter = QPainter()

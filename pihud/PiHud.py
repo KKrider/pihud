@@ -1,12 +1,10 @@
-
 from Page import Page
 from Widget import Widget
 from PageMarker import PageMarker
-from PyQt4 import QtGui, QtCore
+from PyQt5 import QtGui, QtCore, QtWidgets
 
 
-
-class PiHud(QtGui.QMainWindow):
+class PiHud(QtWidgets.QMainWindow):
     def __init__(self, global_config, connection):
         super(PiHud, self).__init__()
         self.global_config = global_config
@@ -21,7 +19,7 @@ class PiHud(QtGui.QMainWindow):
         # ================== Init Pages ===================
 
         self.pageMarker = PageMarker(self)
-        self.stack      = QtGui.QStackedWidget(self)
+        self.stack = QtWidgets.QStackedWidget(self)
         self.setCentralWidget(self.stack)
 
         # read the config and make pages
@@ -30,7 +28,7 @@ class PiHud(QtGui.QMainWindow):
 
         # ================= Context Menu ==================
 
-        self.menu = QtGui.QMenu()
+        self.menu = QtWidgets.QMenu()
         subMenu = self.menu.addMenu("Add Widget")
 
         if len(self.connection.supported_commands) > 0:
@@ -40,7 +38,7 @@ class PiHud(QtGui.QMainWindow):
         else:
             a = subMenu.addAction("No sensors available")
             a.setDisabled(True)
-        
+
         self.menu.addSeparator()
 
         self.menu.addAction("New Page", self.__add_page)
@@ -58,18 +56,14 @@ class PiHud(QtGui.QMainWindow):
 
         self.start()
 
-
     def __page(self):
         return self.stack.currentWidget()
-
 
     def __index(self):
         return self.stack.currentIndex()
 
-
     def __count(self):
         return self.stack.count()
-
 
     def __save(self):
         pages = []
@@ -83,9 +77,7 @@ class PiHud(QtGui.QMainWindow):
 
         self.global_config.save(pages)
 
-
     # ========= Main loop =========
-
 
     def timerEvent(self, event):
         page = self.__page()
@@ -94,36 +86,30 @@ class PiHud(QtGui.QMainWindow):
             r = self.connection.query(widget.get_command())
             widget.render(r)
 
-
     def start(self):
         # watch the commands on this page
         for widget in self.__page().widgets:
             self.connection.watch(widget.get_command())
 
         self.connection.start()
-        self.timer.start(1000/30, self)
-
+        self.timer.start(1000 / 30, self)
 
     def stop(self):
-        self.timer.stop();
+        self.timer.stop()
         self.connection.stop()
         self.connection.unwatch_all()
-
 
     def restart(self):
         self.stop()
         self.start()
 
-
     # ========= Widget Actions =========
-
 
     def __add_existing_widget(self, page, config):
         # make a widget from the given config
         widget = Widget(page, config)
         # add it to the page
         page.widgets.append(widget)
-
 
     def __add_widget(self, command):
         # make a default config for this command
@@ -135,20 +121,17 @@ class PiHud(QtGui.QMainWindow):
         # register the new command
         self.restart()
 
-
     def delete_widget(self, page, widget):
         # called by the pages themselves
         page.widgets.remove(widget)
         p = self.stack.indexOf(page)
         widget.deleteLater()
 
-        # reload this page again, to unwatch (if neccessary,
+        # reload this page again, to unwatch (if necessary,
         # since multiple widgets could be using the same command)
         self.restart()
 
-
     # ========= Page Actions =========
-
 
     def __add_existing_page(self, configs=None):
         """ adds a page and fills with the given widgets """
@@ -160,17 +143,13 @@ class PiHud(QtGui.QMainWindow):
 
         self.stack.addWidget(page)
 
-
     def __add_page(self):
         """ adds a new (empty) page to the end of the page stack """
         self.__add_existing_page()
         self.goto_page(self.__count() - 1)
 
-
-
     def __delete_page(self):
         if self.__count() > 1:
-
             self.stop()
 
             page = self.__page()
@@ -180,9 +159,7 @@ class PiHud(QtGui.QMainWindow):
 
             self.stack.removeWidget(page)
             page.deleteLater()
-            self.goto_page(self.__index()) # calls start()
-
-
+            self.goto_page(self.__index())  # calls start()
 
     def goto_page(self, p):
         p = p % len(self.stack)
@@ -195,24 +172,20 @@ class PiHud(QtGui.QMainWindow):
 
         self.start()
 
-
     def next_page(self):
         """ cycle through the screen stack """
         self.goto_page(self.__index() + 1)
 
-
     # ========= Window Actions =========
-
 
     def contextMenuEvent(self, e):
         action = self.menu.exec_(self.mapToGlobal(e.pos()))
         if action is not None:
-            command = action.data().toPyObject()
+            command = action.data()
             # if this is a command creation action, make the new widget
             # there's got to be a better way to do this...
             if command is not None:
                 self.__add_widget(command)
-
 
     def keyPressEvent(self, e):
         key = e.key()
@@ -223,7 +196,6 @@ class PiHud(QtGui.QMainWindow):
 
         elif key == QtCore.Qt.Key_Tab:
             self.next_page()
-
 
     def closeEvent(self, e):
         quit()
